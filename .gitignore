@@ -1,0 +1,24 @@
+# Simulation and build outputs
+sim/build/
+sim/logs/
+sim/waveforms/
+obj_dir/
+obj_dir_*/
+*.vcd
+*.fst
+*.vvp
+*.out
+
+# Generated software artifacts
+software/generated/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Editor and operating-system files
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

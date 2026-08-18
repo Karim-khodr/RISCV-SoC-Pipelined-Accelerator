@@ -1,0 +1,1 @@
+rtl/accelerator/pipelined/dot_product_pipeline.sv
