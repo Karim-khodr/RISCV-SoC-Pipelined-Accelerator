@@ -18,6 +18,9 @@ make -s test-accel-seq 2>&1 | tee sim/logs/accel_seq.log
 echo "[DAY 1] Running pipelined accelerator deterministic tests..."
 make -s test-accel-pipe 2>&1 | tee sim/logs/accel_pipe.log
 
+echo "[DAY 2] Running pipelined accelerator randomized tests..."
+make -s test-accel-pipe-random 2>&1 | tee sim/logs/accel_pipe_random.log
+
 echo "[PHASE 0] Running Python golden model..."
 make -s test-golden 2>&1 | tee sim/logs/golden_model.log
 
@@ -26,6 +29,7 @@ echo "RTL LINT                  PASS"
 echo "CPU BASELINE              PASS"
 echo "SEQUENTIAL ACCELERATOR    PASS"
 echo "PIPELINED ACCELERATOR     PASS"
+echo "PIPELINE RANDOM STRESS    PASS"
 echo "PYTHON GOLDEN MODEL       PASS"
 echo "========================================"
 echo "FULL REGRESSION PASSED"

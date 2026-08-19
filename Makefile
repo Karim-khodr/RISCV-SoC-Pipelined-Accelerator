@@ -15,10 +15,13 @@ CPU_REGFILE  := rtl/cpu/regfile.sv
 CPU_IMM_GEN  := rtl/cpu/imm_gen.sv
 CPU_DECODER  := rtl/cpu/decoder.sv
 
-.PHONY: test test-cpu test-accel-seq test-accel-pipe test-golden test-alu test-regfile \
+.PHONY: test test-cpu test-accel-seq test-accel-pipe test-accel-pipe-random test-golden test-alu test-regfile \
         test-imm test-decoder test-cpu-core lint lint-cpu lint-alu \
-        lint-regfile lint-imm lint-decoder lint-cpu-core lint-accel-seq lint-accel-pipe \
+        lint-regfile lint-imm lint-decoder lint-cpu-core lint-accel-seq lint-accel-pipe lint-accel-pipe-random \
         clean prepare-dirs
+
+SEED        ?= 12345
+RANDOM_TXNS ?= 3000
 
 test: prepare-dirs
 	bash scripts/run_regression.sh
@@ -36,6 +39,13 @@ test-accel-pipe: prepare-dirs
 		-o $(BUILD_DIR)/dot_product_pipeline_tb.vvp \
 		-f filelists/accel_pipe.f tb/accelerator/pipelined/dot_product_pipeline_tb.sv
 	$(VVP) $(BUILD_DIR)/dot_product_pipeline_tb.vvp
+
+test-accel-pipe-random: prepare-dirs
+	$(IVERILOG) -g2012 -Wall -s dot_product_pipeline_random_tb \
+		-o $(BUILD_DIR)/dot_product_pipeline_random_tb.vvp \
+		-f filelists/accel_pipe.f tb/accelerator/pipelined/dot_product_pipeline_random_tb.sv
+	$(VVP) $(BUILD_DIR)/dot_product_pipeline_random_tb.vvp \
+		+SEED=$(SEED) +NUM_TXNS=$(RANDOM_TXNS)
 
 test-golden:
 	$(PYTHON) model/golden_model.py
@@ -60,7 +70,7 @@ test-cpu-core: prepare-dirs
 	bash scripts/run_verilator_test.sh cpu cpu_core_tb \
 		-f filelists/cpu.f tb/cpu/cpu_core_tb.sv
 
-lint: lint-cpu lint-accel-seq lint-accel-pipe
+lint: lint-cpu lint-accel-seq lint-accel-pipe lint-accel-pipe-random
 
 lint-cpu: lint-alu lint-regfile lint-imm lint-decoder lint-cpu-core
 
@@ -98,6 +108,11 @@ lint-accel-pipe: prepare-dirs
 	$(VERILATOR) -Wall --timing --assert --lint-only \
 		-f filelists/accel_pipe.f tb/accelerator/pipelined/dot_product_pipeline_tb.sv \
 		--top-module dot_product_pipeline_tb
+
+lint-accel-pipe-random: prepare-dirs
+	$(VERILATOR) -Wall --timing --assert --lint-only \
+		-f filelists/accel_pipe.f tb/accelerator/pipelined/dot_product_pipeline_random_tb.sv \
+		--top-module dot_product_pipeline_random_tb
 
 prepare-dirs:
 	mkdir -p $(BUILD_DIR) $(WAVE_DIR) $(LOG_DIR)
