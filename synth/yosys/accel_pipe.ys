@@ -1,0 +1,18 @@
+read_verilog -sv rtl/accelerator/pipelined/dot_product_pipeline.sv
+chparam -set ELEM_WIDTH 8 -set NUM_ELEMS 4 -set RESULT_WIDTH 32 dot_product_pipeline
+hierarchy -check -top dot_product_pipeline
+
+# Preserve inferred arithmetic and control cells before technology-independent
+# lowering decomposes them into generic logic.
+proc
+opt
+check
+tee -q -o results/synthesis/pipe_pre.stat stat
+tee -q -o results/synthesis/pipe_pre.json stat -json
+
+# Apply the same generic, flattened synthesis flow used for the sequential core.
+# No Liberty file or technology-specific mapping is used.
+synth -top dot_product_pipeline -flatten
+check
+tee -q -o results/synthesis/pipe_post.stat stat
+tee -q -o results/synthesis/pipe_post.json stat -json

@@ -1,0 +1,2 @@
+PERF architecture=sequential transactions=100 latency_cycles=4 minimum_ii_cycles=5 completion_interval_cycles=5 throughput_numerator=1 throughput_denominator=5 first_accept_edge=5 last_completion_edge=504 batch_span_cycles=499 errors=0
+tb/accelerator/performance/dot_product_seq_perf_tb.sv:156: $finish called at 5036000 (1ps)

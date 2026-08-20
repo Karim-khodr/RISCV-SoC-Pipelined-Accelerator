@@ -42,14 +42,14 @@ module dot_product_seq #(
 
     function automatic logic [ELEM_WIDTH-1:0] get_elem(
         input logic [VEC_WIDTH-1:0] vec,
-        input int unsigned idx
+        input logic [IDX_WIDTH-1:0] idx
     );
         get_elem = vec[idx*ELEM_WIDTH +: ELEM_WIDTH];
     endfunction
 
     always_comb begin
-        a_elem     = get_elem(vec_a_q, int'(idx_q));
-        b_elem     = get_elem(vec_b_q, int'(idx_q));
+        a_elem     = get_elem(vec_a_q, idx_q);
+        b_elem     = get_elem(vec_b_q, idx_q);
         product    = a_elem * b_elem;
         product_ext = {{(RESULT_WIDTH-PROD_WIDTH){1'b0}}, product};
         acc_next   = acc_q + product_ext;

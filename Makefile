@@ -2,6 +2,7 @@ VERILATOR ?= verilator
 IVERILOG ?= iverilog
 VVP       ?= vvp
 PYTHON    ?= python3
+YOSYS     ?= yosys
 
 BUILD_DIR := sim/build
 WAVE_DIR  := sim/waveforms
@@ -18,6 +19,8 @@ CPU_DECODER  := rtl/cpu/decoder.sv
 .PHONY: test test-cpu test-accel-seq test-accel-pipe test-accel-pipe-random test-golden test-alu test-regfile \
         test-imm test-decoder test-cpu-core lint lint-cpu lint-alu \
         lint-regfile lint-imm lint-decoder lint-cpu-core lint-accel-seq lint-accel-pipe lint-accel-pipe-random \
+        lint-accel-performance \
+        synth-accel-seq synth-accel-pipe synth-accel perf-accel compare-accel \
         clean prepare-dirs
 
 SEED        ?= 12345
@@ -70,7 +73,7 @@ test-cpu-core: prepare-dirs
 	bash scripts/run_verilator_test.sh cpu cpu_core_tb \
 		-f filelists/cpu.f tb/cpu/cpu_core_tb.sv
 
-lint: lint-cpu lint-accel-seq lint-accel-pipe lint-accel-pipe-random
+lint: lint-cpu lint-accel-seq lint-accel-pipe lint-accel-pipe-random lint-accel-performance
 
 lint-cpu: lint-alu lint-regfile lint-imm lint-decoder lint-cpu-core
 
@@ -113,6 +116,30 @@ lint-accel-pipe-random: prepare-dirs
 	$(VERILATOR) -Wall --timing --assert --lint-only \
 		-f filelists/accel_pipe.f tb/accelerator/pipelined/dot_product_pipeline_random_tb.sv \
 		--top-module dot_product_pipeline_random_tb
+
+lint-accel-performance: prepare-dirs
+	$(VERILATOR) -Wall --timing --assert --lint-only \
+		rtl/accelerator/sequential/dot_product_seq.sv \
+		tb/accelerator/performance/dot_product_seq_perf_tb.sv \
+		--top-module dot_product_seq_perf_tb
+	$(VERILATOR) -Wall --timing --assert --lint-only \
+		rtl/accelerator/pipelined/dot_product_pipeline.sv \
+		tb/accelerator/performance/dot_product_pipeline_perf_tb.sv \
+		--top-module dot_product_pipeline_perf_tb
+
+synth-accel-seq:
+	YOSYS=$(YOSYS) bash scripts/synth_accelerators.sh seq
+
+synth-accel-pipe:
+	YOSYS=$(YOSYS) bash scripts/synth_accelerators.sh pipe
+
+synth-accel: synth-accel-seq synth-accel-pipe
+
+perf-accel:
+	IVERILOG=$(IVERILOG) VVP=$(VVP) bash scripts/run_accel_performance.sh all
+
+compare-accel: synth-accel perf-accel
+	YOSYS=$(YOSYS) $(PYTHON) scripts/compare_accelerators.py
 
 prepare-dirs:
 	mkdir -p $(BUILD_DIR) $(WAVE_DIR) $(LOG_DIR)

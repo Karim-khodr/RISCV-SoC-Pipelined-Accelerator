@@ -1,0 +1,18 @@
+read_verilog -sv rtl/accelerator/sequential/dot_product_seq.sv
+chparam -set ELEM_WIDTH 8 -set NUM_ELEMS 4 -set RESULT_WIDTH 32 dot_product_seq
+hierarchy -check -top dot_product_seq
+
+# Preserve inferred arithmetic and control cells before technology-independent
+# lowering decomposes them into generic logic.
+proc
+opt
+check
+tee -q -o results/synthesis/seq_pre.stat stat
+tee -q -o results/synthesis/seq_pre.json stat -json
+
+# Apply the same generic, flattened synthesis flow used for the pipeline.
+# No Liberty file or technology-specific mapping is used.
+synth -top dot_product_seq -flatten
+check
+tee -q -o results/synthesis/seq_post.stat stat
+tee -q -o results/synthesis/seq_post.json stat -json

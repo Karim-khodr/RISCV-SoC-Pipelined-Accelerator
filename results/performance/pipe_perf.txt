@@ -1,0 +1,2 @@
+PERF architecture=pipelined transactions=100 latency_cycles=3 minimum_ii_cycles=1 completion_interval_cycles=1 throughput_numerator=1 throughput_denominator=1 first_accept_edge=5 last_completion_edge=107 batch_span_cycles=102 errors=0
+tb/accelerator/performance/dot_product_pipeline_perf_tb.sv:182: $finish called at 1066000 (1ps)
