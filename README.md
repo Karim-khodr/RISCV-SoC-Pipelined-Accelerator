@@ -5,10 +5,9 @@ RISC-V CPU baseline with a verified sequential dot-product accelerator. The
 long-term goal is a memory-mapped SoC with a high-throughput pipelined
 accelerator and a measured hardware/software performance study.
 
-The repository is currently at the **Day 5 integrated-SoC checkpoint**. The
-single-cycle CPU, data RAM, and pipelined dot-product MMIO peripheral now share
-one decoded data address space. Accelerator-control software and comparative
-CPU/accelerator measurements remain Day 6 work.
+The repository now includes the **Day 6 CPU-controlled accelerator benchmark**.
+Real instructions on the single-cycle CPU control the pipelined dot product
+through the Day 5 MMIO path, alongside a CPU-only repeated-add baseline.
 
 ## Implemented and verified
 
@@ -28,13 +27,13 @@ CPU/accelerator measurements remain Day 6 work.
 - Standalone MMIO register wrapper for accelerator control and status.
 - SoC data fabric with explicit RAM/MMIO decode and combinational read mux.
 - Integrated `riscv_accel_soc` top level and focused Day 5 verification.
+- CPU-executed accelerator-control and CPU-only dot-product programs with
+  end-to-end CPU-cycle measurement.
 - Yosys synthesis and behavioral performance comparison of the two accelerator
   architectures.
 
 ## Planned work
 
-- RISC-V software that controls the accelerator through `lw` and `sw`.
-- Software, sequential-hardware, and pipelined-hardware performance comparison.
 - Matrix-multiplication scheduling and buffering.
 - Optional OpenROAD implementation.
 
@@ -102,6 +101,7 @@ make test-accel-pipe
 make test-accel-pipe-random
 make test-accel-mmio
 make test-soc
+make test-soc-software
 make lint-soc
 make test-alu
 make test-regfile
@@ -134,6 +134,8 @@ rtl/soc/                         Day 5 address fabric and integrated top
 tb/cpu/                          CPU unit and program tests
 tb/accelerator/sequential/       Architecture A verification
 tb/soc/                          Day 5 fabric and SoC integration tests
+software/asm/                    Auditable human-readable program listings
+software/programs/               Executable Day 6 machine-code images
 model/                           Python reference models
 filelists/                       Ordered synthesis/source filelists
 scripts/                         Build and regression helpers
