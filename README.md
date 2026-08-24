@@ -5,9 +5,10 @@ RISC-V CPU baseline with a verified sequential dot-product accelerator. The
 long-term goal is a memory-mapped SoC with a high-throughput pipelined
 accelerator and a measured hardware/software performance study.
 
-The repository is currently at the **Phase 0 verified-baseline checkpoint**.
-It does not yet contain the pipelined accelerator, MMIO register block,
-address decoder, or SoC top level.
+The repository is currently at the **Day 5 integrated-SoC checkpoint**. The
+single-cycle CPU, data RAM, and pipelined dot-product MMIO peripheral now share
+one decoded data address space. Accelerator-control software and comparative
+CPU/accelerator measurements remain Day 6 work.
 
 ## Implemented and verified
 
@@ -23,34 +24,35 @@ address decoder, or SoC top level.
 - Directed, protocol, reset, maximum-value, and randomized accelerator tests.
 - Self-checking Python dot-product reference model.
 - Unified lint and regression flow.
+- Three-stage ready/valid pipelined dot-product accelerator.
+- Standalone MMIO register wrapper for accelerator control and status.
+- SoC data fabric with explicit RAM/MMIO decode and combinational read mux.
+- Integrated `riscv_accel_soc` top level and focused Day 5 verification.
+- Yosys synthesis and behavioral performance comparison of the two accelerator
+  architectures.
 
 ## Planned work
 
-- Architecture B: three-stage pipelined dot-product accelerator.
-- Ready/valid streaming interface and backpressure handling.
-- Queue-based randomized scoreboard and temporal assertions.
-- Accelerator MMIO register block.
-- CPU address decoder and SoC integration.
 - RISC-V software that controls the accelerator through `lw` and `sw`.
 - Software, sequential-hardware, and pipelined-hardware performance comparison.
-- Yosys synthesis and fair area/timing/resource comparisons.
 - Matrix-multiplication scheduling and buffering.
 - Optional OpenROAD implementation.
 
 ## Current architecture
 
-The compatibility system used by the CPU regression is:
+The integrated Day 5 system is:
 
 ```text
-Instruction memory --> rv32i_core --> data memory
-                           |
-                           +--> debug/status signals
+Instruction memory --> rv32i_core --> data fabric --> data RAM
+                                         |
+                                         +----------> MMIO accelerator
 ```
 
-For future SoC integration, `rv32i_core` exposes instruction address/data and
-data read-enable, write-enable, address, write-data, and read-data signals.
-The future address decoder will connect that data interface to RAM and MMIO
-peripherals without pipelining the CPU.
+The data RAM occupies byte addresses `0x0000_0000`–`0x0000_03ff`. The
+accelerator occupies `0x0000_0400`–`0x0000_041f`; the fabric subtracts the
+base before passing byte offsets to the MMIO wrapper. Reads remain
+combinational and writes remain edge-triggered, so the CPU is still
+single-cycle.
 
 The sequential accelerator computes:
 
@@ -71,6 +73,11 @@ Each vector contains four packed unsigned bytes, with element 0 in bits
 | Decoder | 114 tests, 0 failures |
 | CPU programs | 3 passed |
 | Sequential accelerator | 113 tests, 0 failures |
+| Pipelined accelerator directed | 7 tests, 0 failures |
+| Pipelined accelerator randomized | 3,000 random accepts, 0 protocol/checker failures |
+| Accelerator MMIO | 17 tests, 0 failures |
+| SoC data fabric | 17 tests, 0 failures |
+| SoC RAM-only CPU integration | passed |
 | Python golden model | 6 tests passed |
 
 See [Phase 0 baseline results](results/baseline/phase0_baseline.md) for the
@@ -91,6 +98,11 @@ Useful individual targets include:
 ```bash
 make test-cpu
 make test-accel-seq
+make test-accel-pipe
+make test-accel-pipe-random
+make test-accel-mmio
+make test-soc
+make lint-soc
 make test-alu
 make test-regfile
 make test-imm
@@ -116,8 +128,12 @@ space-free directory and copies retained build output back to `sim/build/`.
 rtl/cpu/                         CPU datapath and compatibility wrapper
 rtl/memory/                      Instruction and data memories
 rtl/accelerator/sequential/      Architecture A accelerator
+rtl/accelerator/pipelined/       Three-stage accelerator datapath
+rtl/accelerator/mmio/            Local MMIO wrapper
+rtl/soc/                         Day 5 address fabric and integrated top
 tb/cpu/                          CPU unit and program tests
 tb/accelerator/sequential/       Architecture A verification
+tb/soc/                          Day 5 fabric and SoC integration tests
 model/                           Python reference models
 filelists/                       Ordered synthesis/source filelists
 scripts/                         Build and regression helpers

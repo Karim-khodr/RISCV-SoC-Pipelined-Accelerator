@@ -16,9 +16,9 @@ CPU_REGFILE  := rtl/cpu/regfile.sv
 CPU_IMM_GEN  := rtl/cpu/imm_gen.sv
 CPU_DECODER  := rtl/cpu/decoder.sv
 
-.PHONY: test test-cpu test-accel-seq test-accel-pipe test-accel-pipe-random test-accel-mmio test-golden test-alu test-regfile \
+.PHONY: test test-cpu test-accel-seq test-accel-pipe test-accel-pipe-random test-accel-mmio test-soc test-soc-fabric test-soc-top test-golden test-alu test-regfile \
         test-imm test-decoder test-cpu-core lint lint-cpu lint-alu \
-        lint-regfile lint-imm lint-decoder lint-cpu-core lint-accel-seq lint-accel-pipe lint-accel-pipe-random lint-accel-mmio \
+        lint-regfile lint-imm lint-decoder lint-cpu-core lint-accel-seq lint-accel-pipe lint-accel-pipe-random lint-accel-mmio lint-soc \
         lint-accel-performance \
         synth-accel-seq synth-accel-pipe synth-accel perf-accel compare-accel \
         clean prepare-dirs
@@ -56,6 +56,18 @@ test-accel-mmio: prepare-dirs
 		-f filelists/accel_mmio.f tb/accelerator/mmio/dot_product_accel_mmio_tb.sv
 	$(VVP) $(BUILD_DIR)/dot_product_accel_mmio_tb.vvp
 
+test-soc: test-soc-fabric test-soc-top
+
+test-soc-fabric: prepare-dirs
+	$(IVERILOG) -g2012 -Wall -s soc_data_fabric_tb \
+		-o $(BUILD_DIR)/soc_data_fabric_tb.vvp \
+		-f filelists/soc.f tb/soc/soc_data_fabric_tb.sv
+	$(VVP) $(BUILD_DIR)/soc_data_fabric_tb.vvp
+
+test-soc-top: prepare-dirs
+	bash scripts/run_verilator_test.sh soc riscv_accel_soc_tb \
+		-f filelists/soc.f tb/soc/riscv_accel_soc_tb.sv
+
 test-golden:
 	$(PYTHON) model/golden_model.py
 
@@ -79,7 +91,7 @@ test-cpu-core: prepare-dirs
 	bash scripts/run_verilator_test.sh cpu cpu_core_tb \
 		-f filelists/cpu.f tb/cpu/cpu_core_tb.sv
 
-lint: lint-cpu lint-accel-seq lint-accel-pipe lint-accel-pipe-random lint-accel-mmio lint-accel-performance
+lint: lint-cpu lint-accel-seq lint-accel-pipe lint-accel-pipe-random lint-accel-mmio lint-soc lint-accel-performance
 
 lint-cpu: lint-alu lint-regfile lint-imm lint-decoder lint-cpu-core
 
@@ -127,6 +139,14 @@ lint-accel-mmio: prepare-dirs
 	$(VERILATOR) -Wall --timing --assert --lint-only \
 		-f filelists/accel_mmio.f tb/accelerator/mmio/dot_product_accel_mmio_tb.sv \
 		--top-module dot_product_accel_mmio_tb
+
+lint-soc: prepare-dirs
+	$(VERILATOR) $(VERILATOR_FLAGS) --lint-only \
+		-f filelists/soc.f tb/soc/soc_data_fabric_tb.sv \
+		--top-module soc_data_fabric_tb
+	$(VERILATOR) $(VERILATOR_FLAGS) --lint-only \
+		-f filelists/soc.f tb/soc/riscv_accel_soc_tb.sv \
+		--top-module riscv_accel_soc_tb
 
 lint-accel-performance: prepare-dirs
 	$(VERILATOR) -Wall --timing --assert --lint-only \

@@ -1,0 +1,12 @@
+rtl/cpu/cpu_pkg.sv
+rtl/cpu/alu.sv
+rtl/cpu/regfile.sv
+rtl/cpu/imm_gen.sv
+rtl/cpu/decoder.sv
+rtl/memory/instr_mem.sv
+rtl/memory/data_mem.sv
+rtl/cpu/rv32i_core.sv
+rtl/accelerator/pipelined/dot_product_pipeline.sv
+rtl/accelerator/mmio/dot_product_accel_mmio.sv
+rtl/soc/soc_data_fabric.sv
+rtl/soc/riscv_accel_soc.sv
