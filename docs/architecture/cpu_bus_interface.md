@@ -3,7 +3,7 @@
 ## Purpose
 
 `rv32i_core` separates the single-cycle processor datapath from instruction
-and data storage. This gives the future SoC direct access to CPU memory
+and data storage. The integrated SoC uses these ports to route CPU memory
 transactions without changing instruction behavior or adding a pipeline.
 
 ## Interfaces
@@ -21,8 +21,8 @@ The data interface contains:
 - `dmem_wdata`: register operand written by a store.
 - `dmem_rdata`: combinational word-load result.
 
-There is no ready/stall signal in Phase 0. Memories and future initial MMIO
-targets must therefore provide zero-wait-state reads and accept writes on the
+There is no ready/stall signal. Instruction memory, data RAM, and the current
+MMIO target therefore provide zero-wait-state reads and accept writes on the
 request edge.
 
 ## Compatibility wrapper
@@ -33,6 +33,6 @@ request edge.
 instr_mem --> rv32i_core --> data_mem
 ```
 
-This wrapper preserves the existing CPU program regression. Future
-`riscv_accel_soc` integration will instantiate `rv32i_core` directly and
-place an address decoder on its data interface.
+This wrapper preserves the standalone CPU program regression. The integrated
+`riscv_accel_soc` top level instantiates `rv32i_core` directly and places
+`soc_data_fabric` on its data interface.

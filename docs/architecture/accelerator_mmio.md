@@ -2,10 +2,10 @@
 
 ## Purpose and scope
 
-`dot_product_accel_mmio` gives the existing ready/valid pipelined dot-product
-accelerator a small software-like register interface. The peripheral is
-verified standalone in Day 4; it is not connected to the CPU and does not own
-a system-level base address.
+`dot_product_accel_mmio` gives the ready/valid pipelined dot-product accelerator
+a small software-visible register interface. It is verified both on its own and
+through the integrated SoC. The wrapper uses local byte offsets; the SoC data
+fabric owns the system-level base address and translates CPU addresses.
 
 ```text
 MMIO reads and writes
@@ -154,14 +154,13 @@ transaction can later produce a stale completion.
 7. The peripheral becomes ready for another operation on the state update.
 
 The underlying three-stage datapath supports initiation interval 1 under
-ideal streaming conditions. This Day 4 MMIO interface intentionally supports
-one software-visible operation outstanding at a time for a simple, robust
-programming model. It does not provide one MMIO command per cycle.
+ideal streaming conditions. This MMIO interface intentionally supports
+one software-visible operation outstanding at a time for a simple programming
+model. It does not provide one MMIO command per cycle.
 
-## Day 5 boundary
+## SoC connection
 
-Day 4 verification drives this local interface directly from a testbench. A
-later SoC address decoder may route selected CPU load/store operations to it
-and provide local offsets. No CPU connection, global accelerator base address,
-read-data mux, SoC top level, or accelerator-control software is implemented
-here.
+`soc_data_fabric` selects this peripheral for CPU addresses from `0x0000_0400`
+through `0x0000_041f` and subtracts `0x0000_0400` to form the local offset.
+`riscv_accel_soc` connects the wrapper to the CPU data interface, and the tracked
+accelerator program controls it with ordinary `lw` and `sw` instructions.

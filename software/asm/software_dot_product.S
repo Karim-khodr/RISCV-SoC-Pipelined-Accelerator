@@ -1,7 +1,7 @@
-# Day 6 synchronized human-readable listing.
+# Synchronized human-readable listing.
 #
 # This file is a manually synchronized human-readable listing and is not
-# assembled or parsed by the build. The Day 6 testbench independently constructs
+# assembled or parsed by the build. The SoC software testbench independently constructs
 # the expected executable words with instruction encoders, loads the tracked
 # .hex image, compares it word-for-word with those generated words, and checks
 # fixed machine-code audit values before execution.

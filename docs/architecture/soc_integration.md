@@ -140,22 +140,17 @@ asynchronous active-low reset. The memories retain their previous initialized
 array behavior and receive no new reset.
 
 The CPU remains single-cycle, its ISA is unchanged, and normal RAM `lw`/`sw`
-behavior is preserved. The CPU RTL, data-memory RTL, pipelined datapath RTL,
-and MMIO wrapper RTL are unchanged by Day 5.
+behavior is preserved.
 
 ## Verification scope
 
-The Day 5 data-fabric test drives CPU-style accesses through the real RAM and
-MMIO wrapper. It covers decode, byte-offset translation, RAM load/store,
+The data-fabric test drives CPU-style accesses through the real RAM and MMIO
+wrapper. It covers decode, byte-offset translation, RAM load/store,
 global register accesses, START/STATUS/RESULT, an independently calculated
 dot product, mux and write isolation, window boundaries, reserved offsets,
 consecutive writes, reset, and unmapped accesses. A separate top-level test
-runs the existing RAM-only CPU program through `riscv_accel_soc` and confirms
-that it never accesses the accelerator.
-
-## Day 6 boundary
-
-Day 5 establishes and verifies the hardware path only. A real RISC-V program
-that writes operands, starts the accelerator, polls status, and consumes the
-result is intentionally deferred to Day 6, along with CPU-versus-accelerator
-cycle and speedup measurements.
+runs a RAM-only CPU program through `riscv_accel_soc` and confirms that it never
+accesses the accelerator. The software integration test loads tracked machine
+code into instruction memory and verifies the complete CPU-controlled sequence,
+including the final result stored back to normal RAM. It also runs the CPU-only
+repeated-add program and checks that it produces no accelerator traffic.

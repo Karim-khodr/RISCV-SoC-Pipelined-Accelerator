@@ -1,10 +1,10 @@
-# Day 3 sequential vs pipelined accelerator comparison
+# Sequential vs pipelined accelerator comparison
 
 ## 1. Purpose
 
 Both verified accelerators implement the same unsigned four-element dot product,
 `a0*b0 + a1*b1 + a2*b2 + a3*b3`, with four packed 8-bit elements per input and
-a 32-bit external result. Day 3 measures the resource and cycle-performance
+a 32-bit external result. This report measures the resource and cycle-performance
 trade-off between iterative arithmetic reuse and a three-stage elastic pipeline.
 
 ## 2. Fair-comparison methodology
@@ -13,7 +13,6 @@ trade-off between iterative arithmetic reuse and a three-stage elastic pipeline.
 - Both designs use the same Yosys executable and identical pre-lowering and generic synthesis passes.
 - Top modules are explicitly selected and parameterized; both post-synthesis designs are flattened.
 - The sequential `start/busy/done` and pipelined ready/valid interfaces are intentionally retained.
-- Git HEAD when report generated: `b2d160486fb89b6f73a48346754496f4f43e6773`.
 - Yosys: `Yosys 0.33 (git sha1 2584903a060)`.
 
 ## 3. Architecture summary
@@ -115,7 +114,7 @@ Liberty library or physical implementation flow is used.
 
 ## 9. Timing qualification
 
-Day 3 performs no technology-specific static timing analysis or physical
+This comparison performs no technology-specific static timing analysis or physical
 implementation. **No physical Fmax is claimed.** The simulation clock period is
 only testbench scheduling and is not a silicon timing measurement.
 

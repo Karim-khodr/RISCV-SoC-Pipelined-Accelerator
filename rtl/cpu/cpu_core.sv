@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 
 // Compatibility wrapper for the original self-contained CPU interface.
-// Future SoC integration instantiates rv32i_core directly and places address
+// The integrated SoC instantiates rv32i_core directly and places address
 // decoding between its data-memory interface and system peripherals.
 module cpu_core #(
   parameter int IMEM_DEPTH = 256,

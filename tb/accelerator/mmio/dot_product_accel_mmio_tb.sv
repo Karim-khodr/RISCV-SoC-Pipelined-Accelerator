@@ -602,7 +602,7 @@ module dot_product_accel_mmio_tb;
 
         $display("");
         $display("============================================");
-        $display("Day 4 MMIO Accelerator Test Summary");
+        $display("MMIO Accelerator Test Summary");
         $display("============================================");
         $display("Tests run             : %0d", tests_run);
         $display("Test failures         : %0d", failures);

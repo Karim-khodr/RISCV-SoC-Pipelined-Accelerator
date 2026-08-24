@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the reproducible Day 3 accelerator architecture comparison."""
+"""Generate the reproducible accelerator architecture comparison."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SYNTH_DIR = REPO_ROOT / "results" / "synthesis"
 PERF_DIR = REPO_ROOT / "results" / "performance"
-REPORT_PATH = REPO_ROOT / "results" / "day3_synthesis_comparison.md"
+REPORT_PATH = REPO_ROOT / "results" / "accelerator_architecture_comparison.md"
 
 
 def command_first_line(*args: str) -> str:
@@ -124,8 +124,6 @@ def main() -> int:
     iverilog_version = command_first_line("iverilog", "-V")
     verilator_version = command_first_line("verilator", "--version")
     python_version = command_first_line(sys.executable, "--version")
-    git_head = command_first_line("git", "rev-parse", "HEAD")
-
     throughput_ratio = (
         seq_perf["completion_interval_cycles"]
         / pipe_perf["completion_interval_cycles"]
@@ -134,13 +132,13 @@ def main() -> int:
     seq_warning = warning_summary("seq")
     pipe_warning = warning_summary("pipe")
 
-    report = f"""# Day 3 sequential vs pipelined accelerator comparison
+    report = f"""# Sequential vs pipelined accelerator comparison
 
 ## 1. Purpose
 
 Both verified accelerators implement the same unsigned four-element dot product,
 `a0*b0 + a1*b1 + a2*b2 + a3*b3`, with four packed 8-bit elements per input and
-a 32-bit external result. Day 3 measures the resource and cycle-performance
+a 32-bit external result. This report measures the resource and cycle-performance
 trade-off between iterative arithmetic reuse and a three-stage elastic pipeline.
 
 ## 2. Fair-comparison methodology
@@ -149,7 +147,6 @@ trade-off between iterative arithmetic reuse and a three-stage elastic pipeline.
 - Both designs use the same Yosys executable and identical pre-lowering and generic synthesis passes.
 - Top modules are explicitly selected and parameterized; both post-synthesis designs are flattened.
 - The sequential `start/busy/done` and pipelined ready/valid interfaces are intentionally retained.
-- Git HEAD when report generated: `{git_head}`.
 - Yosys: `{yosys_version}`.
 
 ## 3. Architecture summary
@@ -251,7 +248,7 @@ Liberty library or physical implementation flow is used.
 
 ## 9. Timing qualification
 
-Day 3 performs no technology-specific static timing analysis or physical
+This comparison performs no technology-specific static timing analysis or physical
 implementation. **No physical Fmax is claimed.** The simulation clock period is
 only testbench scheduling and is not a silicon timing measurement.
 

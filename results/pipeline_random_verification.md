@@ -1,6 +1,6 @@
-# Day 2 randomized pipeline verification
+# Randomized pipeline verification
 
-The Day 2 testbench stress-tests the existing three-stage elastic dot-product
+The randomized testbench stress-tests the three-stage elastic dot-product
 pipeline without changing its RTL. It uses a handshake-driven three-entry ring
 FIFO scoreboard (portable to both Icarus and Verilator):
 expected results are added only on `in_valid && in_ready`, and checked/removed
@@ -38,7 +38,7 @@ script.
 
 ## Default passing run
 
-The final seed-12345 run completed in 6,695 cycles. It accepted 3,000 randomized
+The final seed-12345 run completed in 6,688 cycles. It accepted 3,000 randomized
 transactions (3,013 including directed setup/recovery traffic), consumed and
 checked 2,998 outputs, and intentionally discarded 15 accepted transactions over
 seven reset events. It observed 801 input-bubble cycles, 2,859 input-backpressure

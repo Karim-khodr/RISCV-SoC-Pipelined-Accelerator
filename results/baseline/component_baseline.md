@@ -1,4 +1,4 @@
-# Phase 0 verified baseline
+# Migrated component baseline
 
 ## CPU
 
@@ -21,10 +21,10 @@ results were unchanged.
 
 The original migrated regression was reproduced before testbench expansion:
 
-| Checkpoint | Tests | Failures |
+| Verification set | Tests | Failures |
 |---|---:|---:|
 | Original Architecture A baseline | 109 | 0 |
-| Expanded Phase 0 verification | 113 | 0 |
+| Expanded repository verification | 113 | 0 |
 
 The expanded suite preserves the original directed and 100 randomized vector
 tests and adds explicit checks for:

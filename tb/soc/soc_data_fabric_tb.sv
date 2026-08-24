@@ -532,7 +532,7 @@ module soc_data_fabric_tb;
 
         $display("");
         $display("============================================");
-        $display("Day 5 SoC Data Fabric Test Summary");
+        $display("SoC Data Fabric Test Summary");
         $display("============================================");
         $display("Tests run             : %0d", tests_run);
         $display("Test failures         : %0d", failures);

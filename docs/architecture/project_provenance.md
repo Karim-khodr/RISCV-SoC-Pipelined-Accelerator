@@ -37,9 +37,10 @@ Empty or unfinished accelerator register-wrapper, top-level, testbench,
 synthesis, and report placeholders were not treated as implementations.
 Generated build products, waveforms, binaries, and logs were also excluded.
 
-## Future architecture
+## Current combined architecture
 
-**Architecture B** will be a new pipelined dot-product accelerator with a
-ready/valid streaming protocol. It has not been implemented in Phase 0.
-Likewise, MMIO, address decoding, an SoC top level, matrix multiplication, and
-OpenROAD work remain future phases.
+The repository now contains both the sequential baseline and a three-stage
+ready/valid pipelined dot-product accelerator. The pipelined design is connected
+to an MMIO wrapper and an SoC data fabric so CPU software can control it through
+loads and stores. Matrix multiplication and a physical implementation flow are
+not part of the current design.

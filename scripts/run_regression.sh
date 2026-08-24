@@ -6,31 +6,31 @@ cd "${repo_root}"
 
 mkdir -p sim/build sim/logs sim/waveforms
 
-echo "[PHASE 0] Linting RTL and testbenches..."
+echo "[LINT] Linting RTL and testbenches..."
 make -s lint 2>&1 | tee sim/logs/lint.log
 
-echo "[PHASE 0] Running CPU baseline..."
+echo "[CPU] Running CPU tests..."
 make -s test-cpu 2>&1 | tee sim/logs/cpu.log
 
-echo "[PHASE 0] Running sequential accelerator baseline..."
+echo "[ACCEL SEQ] Running sequential accelerator tests..."
 make -s test-accel-seq 2>&1 | tee sim/logs/accel_seq.log
 
-echo "[DAY 1] Running pipelined accelerator deterministic tests..."
+echo "[ACCEL PIPE] Running pipelined accelerator directed tests..."
 make -s test-accel-pipe 2>&1 | tee sim/logs/accel_pipe.log
 
-echo "[DAY 2] Running pipelined accelerator randomized tests..."
+echo "[ACCEL RANDOM] Running pipelined accelerator randomized tests..."
 make -s test-accel-pipe-random 2>&1 | tee sim/logs/accel_pipe_random.log
 
-echo "[DAY 4] Running standalone accelerator MMIO tests..."
+echo "[MMIO] Running standalone accelerator MMIO tests..."
 make -s test-accel-mmio 2>&1 | tee sim/logs/accel_mmio.log
 
-echo "[DAY 5] Running SoC data-fabric and top-level integration tests..."
+echo "[SOC] Running data-fabric and top-level integration tests..."
 make -s test-soc 2>&1 | tee sim/logs/soc.log
 
-echo "[DAY 6] Running CPU-controlled accelerator and software baseline..."
+echo "[SOC SOFTWARE] Running CPU-controlled accelerator and software reference..."
 make -s test-soc-software 2>&1 | tee sim/logs/soc_software.log
 
-echo "[PHASE 0] Running Python golden model..."
+echo "[MODEL] Running Python golden model..."
 make -s test-golden 2>&1 | tee sim/logs/golden_model.log
 
 echo "========================================"

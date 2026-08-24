@@ -599,7 +599,7 @@ module riscv_accel_software_tb;
         // initial blocks finish before hierarchical program/data loading.
         #1;
 
-        $display("[DAY 6] Running CPU-controlled accelerator program");
+        $display("[ACCELERATED] Running CPU-controlled accelerator program");
         prepare_benchmark(BENCH_ACCEL);
         run_until_halt(BENCH_ACCEL, ACCEL_HALT_PC, ACCEL_TIMEOUT_CYCLES);
 
@@ -645,7 +645,7 @@ module riscv_accel_software_tb;
         $display("ACCELERATOR PROTOCOL: starts=%0d accepts=%0d completions=%0d reset_discards=%0d",
             accepted_starts, pipeline_accepts, completions, reset_discards);
 
-        $display("[DAY 6] Running CPU-only repeated-add dot product");
+        $display("[SOFTWARE] Running CPU-only repeated-add dot product");
         prepare_benchmark(BENCH_SOFTWARE);
         run_until_halt(BENCH_SOFTWARE, SOFTWARE_HALT_PC,
                        SOFTWARE_TIMEOUT_CYCLES);
@@ -690,13 +690,13 @@ module riscv_accel_software_tb;
             $fatal(1, "Unexpected reset discard count: %0d", reset_discards);
         end
 
-        $display("DAY6_METRIC accelerator_cycles=%0d software_cycles=%0d status_reads=%0d speedup=%0.6f cycle_reduction_pct=%0.6f",
+        $display("SOC_SOFTWARE_METRIC accelerator_cycles=%0d software_cycles=%0d status_reads=%0d speedup=%0.6f cycle_reduction_pct=%0.6f",
             measured_accel_cycles, measured_software_cycles,
             measured_status_reads,
             real'(measured_software_cycles) / real'(measured_accel_cycles),
             100.0 * (1.0 - (real'(measured_accel_cycles)
                              / real'(measured_software_cycles))));
-        $display("DAY 6 SOC SOFTWARE TEST PASSED");
+        $display("SOC SOFTWARE TEST PASSED");
         $finish;
     end
 

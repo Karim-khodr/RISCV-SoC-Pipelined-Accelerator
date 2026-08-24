@@ -1,4 +1,4 @@
-# Day 6 CPU-controlled accelerator performance
+# CPU-controlled accelerator performance
 
 ## Scope
 
@@ -39,7 +39,7 @@ B = {1, 3, 5, 7}, packed as 0x07050301
 | Accelerated result | `0x030` | 12 | 100 after execution |
 | Software result | `0x034` | 13 | 100 after execution |
 
-`DMEM_DEPTH=256` means 256 32-bit words (1,024 bytes), so the highest Day 6
+`DMEM_DEPTH=256` means 256 32-bit words (1,024 bytes), so the highest benchmark
 RAM address, `0x034`, is within the `0x000`-`0x3ff` RAM window.
 
 ## Execution and measurement
@@ -73,7 +73,7 @@ cycle reduction = 1 - (17 / 87)
                 = 80.45977011%
 ```
 
-Repeated identical Day 6 runs produced the same 17-cycle and 87-cycle counts
+Repeated identical runs produced the same 17-cycle and 87-cycle counts
 and the same three STATUS reads.
 
 ## Observed accelerated path
@@ -112,9 +112,10 @@ policy, and final-store-inclusive endpoint. It is not a general dot-product
 speedup, raw pipeline throughput, an Fmax claim, or a silicon performance
 claim.
 
-Day 3 measured standalone accelerator behavior: approximately four-cycle
+The standalone architecture comparison measured four-cycle
 latency/II=5 for the sequential architecture and three-cycle latency/II=1 for
-the pipelined architecture. Day 6 is different: it includes real CPU
+the pipelined architecture. The CPU-program benchmark is different: it includes
+real CPU
 instruction execution, MMIO setup, STATUS polling, RESULT consumption, and
-the final normal-RAM store. The Day 3 and Day 6 numbers must not be combined
+the final normal-RAM store. The two sets of numbers must not be combined
 or described as the same metric.

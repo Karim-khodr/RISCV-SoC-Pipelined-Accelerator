@@ -160,7 +160,7 @@ module dot_product_pipeline_random_tb;
         begin
             $display("");
             $display("========================================================");
-            $display("Pipelined Dot Product Day 2 Random Test Summary");
+            $display("Pipelined Dot Product Random Test Summary");
             $display("========================================================");
             $display("Seed                              : %0d", seed);
             $display("Cycles executed                   : %0d", cycle_count);

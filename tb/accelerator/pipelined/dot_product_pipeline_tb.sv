@@ -665,7 +665,7 @@ module dot_product_pipeline_tb;
 
         $display("");
         $display("============================================");
-        $display("Pipelined Dot Product Day 1 Test Summary");
+        $display("Pipelined Dot Product Directed Test Summary");
         $display("============================================");
         $display("Tests run          : %0d", tests_run);
         $display("Test failures      : %0d", failures);
