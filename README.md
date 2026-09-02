@@ -1,138 +1,55 @@
 # RISC-V SoC with Pipelined Dot-Product Accelerator
 
-This project combines a small single-cycle RISC-V CPU with a pipelined dot-product accelerator written in SystemVerilog.
+This project implements a small single-cycle RISC-V CPU connected to a dot-product accelerator in SystemVerilog. The CPU controls the accelerator through memory-mapped registers and runs a test program that stores the final result in RAM. I also compared sequential and pipelined versions of the accelerator.
 
-The accelerator is connected to the CPU through memory-mapped I/O, so software can load the input vectors, start the accelerator, check its status, read the result, and store it back to RAM using normal `lw` and `sw` instructions.
+## What I Built
 
-The repository also includes self-checking testbenches, randomized verification, a Python golden model, synthesis comparison scripts, and CPU programs used to test the full hardware/software path.
+- A single-cycle CPU supporting a small RV32I subset
+- Sequential and three-stage pipelined dot-product accelerators
+- A memory-mapped interface connecting the pipelined accelerator to the CPU
+- Self-checking unit, randomized, and full-system testbenches
 
-## CPU
+## How It Works
 
-The CPU is a small educational RV32I-subset implementation.
-
-Supported instructions include:
-
-* `add`, `sub`, `and`, `or`, `xor`
-* `addi`, `andi`, `ori`, `xori`
-* `lw`, `sw`
-* `beq`
-
-Instructions such as `MUL`, shifts, jumps, `LUI`, `AUIPC`, and `SLT` are not implemented.
-
-## Dot-product accelerator
-
-The accelerator computes a four-element unsigned dot product:
+The accelerator calculates a four-element unsigned dot product from two packed 32-bit inputs. Each input contains four 8-bit values.
 
 ```text
 result = a0*b0 + a1*b1 + a2*b2 + a3*b3
 ```
 
-Each input contains four packed 8-bit values.
+The accelerator registers are mapped from `0x400` to `0x410`. Software loads the vectors, starts the accelerator, polls the status register, reads the result, and writes it to RAM using normal `lw` and `sw` instructions. The CPU does not support `MUL`, so the CPU-only comparison uses repeated addition.
 
-Two implementations are included:
+## Results
 
-* Sequential version that reuses one multiplier
-* Three-stage pipelined version that computes the products in parallel
+| Measurement | Sequential | Pipelined |
+| --- | ---: | ---: |
+| Latency | 4 cycles | 3 cycles |
+| Initiation interval | 5 cycles | 1 cycle |
+| Throughput | 0.2 results/cycle | 1.0 result/cycle |
+| 100-result test | 499 cycles | 102 cycles |
 
-The pipelined version was measured at:
+The CPU-only dot-product program took 87 cycles. The program using the accelerator took 17 cycles, which was a 5.12x improvement and an 80.46% cycle reduction for this test. Both programs produced a result of `100`.
 
-* 3-cycle latency
-* initiation interval of 1 cycle
-* up to 1 result per cycle once the pipeline is full
+The two programs use different input layouts, so these cycle counts apply to this CPU and test program rather than a general hardware speedup. More detail is in [results/accelerator_architecture_comparison.md](results/accelerator_architecture_comparison.md) and [results/cpu_accelerator_performance.md](results/cpu_accelerator_performance.md).
 
-The MMIO interface currently allows one software-visible operation at a time.
+## Testing / Verification
 
-## Memory-mapped interface
+I tested the CPU blocks, both accelerators, the memory-mapped interface, address routing, and the full CPU-to-accelerator-to-RAM path. The randomized pipeline test accepted 3,000 random inputs and checked stalls and resets. The full regression and accelerator comparison both pass with no mismatches or protocol failures.
 
-The accelerator is mapped at `0x0000_0400`.
+Detailed test counts are in [results/verification_summary.md](results/verification_summary.md).
 
-| Address       | Register  |
-| ------------- | --------- |
-| `0x0000_0400` | `CONTROL` |
-| `0x0000_0404` | `STATUS`  |
-| `0x0000_0408` | `VEC_A`   |
-| `0x0000_040C` | `VEC_B`   |
-| `0x0000_0410` | `RESULT`  |
-
-The CPU writes the two input vectors, writes `START`, polls `RESULT_VALID`, then reads the result.
-
-Normal data RAM occupies `0x0000_0000` through `0x0000_03FF`.
-
-## Hardware/software test
-
-The CPU-controlled program uses:
+## Repository Structure
 
 ```text
-A = {2,4,6,8}
-B = {1,3,5,7}
-```
-
-which gives:
-
-```text
-2*1 + 4*3 + 6*5 + 8*7 = 100
-```
-
-The accelerator result, CPU-visible result, and final RAM value are all checked against `100`.
-
-A separate CPU-only version calculates the same result using repeated addition because the CPU does not implement `MUL`.
-
-## Verification
-
-The project includes:
-
-* CPU unit and program tests
-* Directed accelerator tests
-* Randomized pipeline testing with stalls and resets
-* Scoreboarding and transaction accounting
-* MMIO testing
-* SoC address-routing tests
-* CPU-to-accelerator-to-RAM integration testing
-* Python golden-model checks
-* Verilator lint
-
-The full regression passes with no test or protocol failures.
-
-Detailed counts are available in [results/verification_summary.md](results/verification_summary.md).
-
-## Performance
-
-The standalone accelerator comparison measured:
-
-* Sequential: 4-cycle latency, II = 5, 0.2 results/cycle
-* Pipelined: 3-cycle latency, II = 1, 1.0 result/cycle
-
-The pipelined design uses four multipliers instead of one, trading more hardware for higher throughput.
-
-For the CPU benchmark:
-
-```text
-CPU-only program:    87 cycles
-Accelerated program: 17 cycles
-```
-
-For this specific benchmark, this is a `5.12x` cycle-count improvement and an `80.46%` reduction in CPU cycles.
-
-The two programs do not use identical input representations, so this should be treated as an end-to-end result for this particular CPU and benchmark, not as a general hardware speedup.
-
-More details are available in:
-
-* [Accelerator architecture comparison](results/accelerator_architecture_comparison.md)
-* [CPU accelerator benchmark](results/cpu_accelerator_performance.md)
-
-## Repository structure
-
-```text
-rtl/        RTL for the CPU, memories, accelerator, and SoC
+rtl/        CPU, memory, accelerator, and SoC RTL
 tb/         SystemVerilog testbenches
-software/   CPU program listings and machine-code images
+software/   CPU programs and machine-code files
 model/      Python golden model
-scripts/    Regression and comparison scripts
-docs/       Additional architecture notes
+scripts/    Test and comparison scripts
 results/    Verification and performance results
 ```
 
-## Running the tests
+## Build / Run
 
 Run the full regression:
 
@@ -140,25 +57,12 @@ Run the full regression:
 make test
 ```
 
-Run the sequential versus pipelined comparison:
+Run the sequential and pipelined comparison:
 
 ```bash
 make compare-accel
 ```
 
-The project uses GNU Make, Bash, Verilator, Icarus Verilog, Python 3, and Yosys.
+## Tools
 
-## Current limitations
-
-This is an educational CPU and SoC rather than a complete RISC-V system.
-
-The design currently has:
-
-* a limited RV32I instruction subset
-* no caches
-* polling-based accelerator completion
-* one outstanding software-visible accelerator command
-* no DMA or interrupts
-* no FPGA or physical ASIC implementation
-
-The synthesis results are generic Yosys structural comparisons, not physical timing, power, area, or PPA measurements.
+SystemVerilog, Verilator, Icarus Verilog, Yosys, Python 3, GNU Make, and Bash.
