@@ -7,12 +7,10 @@ hierarchy -check -top dot_product_pipeline
 proc
 opt
 check
-tee -q -o results/synthesis/pipe_pre.stat stat
 tee -q -o results/synthesis/pipe_pre.json stat -json
 
 # Apply the same generic, flattened synthesis flow used for the sequential core.
 # No Liberty file or technology-specific mapping is used.
 synth -top dot_product_pipeline -flatten
 check
-tee -q -o results/synthesis/pipe_post.stat stat
 tee -q -o results/synthesis/pipe_post.json stat -json

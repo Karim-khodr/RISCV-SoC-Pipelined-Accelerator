@@ -30,13 +30,13 @@ The accelerator registers are mapped from `0x400` to `0x410`. Software loads the
 
 The CPU-only dot-product program took 87 cycles. The program using the accelerator took 17 cycles, which was a 5.12x improvement and an 80.46% cycle reduction for this test. Both programs produced a result of `100`.
 
-The two programs use different input layouts, so these cycle counts apply to this CPU and test program rather than a general hardware speedup. More detail is in [results/accelerator_architecture_comparison.md](results/accelerator_architecture_comparison.md) and [results/cpu_accelerator_performance.md](results/cpu_accelerator_performance.md).
+The two programs use different input layouts, so these cycle counts apply to this CPU and test program rather than a general hardware speedup. More detail is in [results/accelerator_comparison.md](results/accelerator_comparison.md) and [results/cpu_benchmark.md](results/cpu_benchmark.md).
 
 ## Testing / Verification
 
 I tested the CPU blocks, both accelerators, the memory-mapped interface, address routing, and the full CPU-to-accelerator-to-RAM path. The randomized pipeline test accepted 3,000 random inputs and checked stalls and resets. The full regression and accelerator comparison both pass with no mismatches or protocol failures.
 
-Detailed test counts are in [results/verification_summary.md](results/verification_summary.md).
+Detailed test counts are in [results/verification.md](results/verification.md).
 
 ## Repository Structure
 
