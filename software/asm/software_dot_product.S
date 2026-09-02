@@ -1,10 +1,5 @@
-# Synchronized human-readable listing.
-#
-# This file is a manually synchronized human-readable listing and is not
-# assembled or parsed by the build. The SoC software testbench independently constructs
-# the expected executable words with instruction encoders, loads the tracked
-# .hex image, compares it word-for-word with those generated words, and checks
-# fixed machine-code audit values before execution.
+# Human-readable listing for the tracked .hex program.
+# The SoC software testbench independently checks every executable word.
 # RAM byte addresses: A0..A3=0x010,0x014,0x018,0x01c;
 #                     B0..B3=0x020,0x024,0x028,0x02c;
 #                     software result=0x034.

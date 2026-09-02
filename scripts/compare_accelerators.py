@@ -42,32 +42,16 @@ def extract_synthesis(prefix: str) -> dict:
     pre_types = pre["num_cells_by_type"]
     post_types = post["num_cells_by_type"]
 
-    pre_register_cells = count_matching(
-        pre_types,
-        lambda name: name.startswith(("$dff", "$adff", "$sdff")),
-    )
     post_register_cells = count_matching(
         post_types, lambda name: name.startswith("$_DFF")
     )
-    pre_mux_like = sum(pre_types.get(name, 0) for name in ("$mux", "$pmux", "$shiftx"))
-    pre_comparators = sum(
-        pre_types.get(name, 0)
-        for name in ("$eq", "$ne", "$eqx", "$nex", "$lt", "$le", "$ge", "$gt")
-    )
 
     return {
-        "pre_total_cells": pre["num_cells"],
         "inferred_multipliers": pre_types.get("$mul", 0),
         "inferred_adders": pre_types.get("$add", 0),
-        "pre_register_cells": pre_register_cells,
-        "pre_mux_like_cells": pre_mux_like,
-        "pre_comparator_cells": pre_comparators,
-        "pre_cell_types": pre_types,
         "post_total_cells": post["num_cells"],
         "post_register_cells": post_register_cells,
         "post_combinational_cells": post["num_cells"] - post_register_cells,
-        "post_mux_cells": post_types.get("$_MUX_", 0),
-        "post_cell_types": post_types,
     }
 
 
@@ -86,11 +70,6 @@ def parse_performance(path: Path) -> dict:
     if result.get("transactions") != 100 or result.get("errors") != 0:
         raise ValueError(f"invalid performance result in {path}: {result}")
     return result
-
-
-def format_cell_types(cell_types: dict[str, int]) -> str:
-    ordered = sorted(cell_types.items(), key=lambda item: (-item[1], item[0]))
-    return ", ".join(f"`{name}`={count}" for name, count in ordered)
 
 
 def warning_summary(prefix: str) -> str:

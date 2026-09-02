@@ -38,6 +38,8 @@ I tested the CPU blocks, both accelerators, the memory-mapped interface, address
 
 Detailed test counts are in [results/verification.md](results/verification.md).
 
+See [system architecture](docs/architecture/system_architecture.md) for the memory map and MMIO interface, and [project provenance](docs/architecture/project_provenance.md) for the component sources.
+
 ## Repository Structure
 
 ```text
